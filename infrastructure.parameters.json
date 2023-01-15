@@ -1,0 +1,26 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "name": {
+      "value": "wikipage"
+    },
+    "version": {
+      "value": "v1-0-0"
+    },
+    "environment": {
+      "value": "dev"
+    },
+    "appInsightsWorkspaceId": {
+      "value": "/subscriptions/67b95cb4-2cb5-4e86-a980-3e59a6f418ab/resourcegroups/rg-subscription-shared/providers/microsoft.operationalinsights/workspaces/log-subscription-shared"
+    },
+    "tags": {
+      "value": {
+      }
+    },
+    "allowedOrigins": {
+      "value": [
+      ]
+    }
+  }
+}

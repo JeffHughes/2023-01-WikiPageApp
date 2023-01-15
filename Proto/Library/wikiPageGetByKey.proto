@@ -1,0 +1,29 @@
+syntax = "proto3";
+option csharp_namespace = "WikiPageApp.Proto.Library";
+import "google/protobuf/timestamp.Proto";
+import "google/protobuf/wrappers.proto";
+import "wikiPage.proto";
+package wikiPageAppProto;
+
+
+message GetWikiPageByKeyRequest {
+	string key = 1;
+	string value = 2;
+
+}
+
+message GetWikiPageByKeyResponse {
+
+	// TBD comment about field 1
+	string statusCode = 1;
+
+	// TBD comment about field 2
+	string statusMessage = 2;
+
+	// TBD comment about field 3
+	string key = 3;
+
+	// TBD comment about field 4
+	WikiPage data = 4;
+
+}

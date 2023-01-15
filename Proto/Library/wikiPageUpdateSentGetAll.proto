@@ -1,0 +1,31 @@
+syntax = "proto3";
+option csharp_namespace = "WikiPageApp.Proto.Library";
+import "google/protobuf/timestamp.Proto";
+import "google/protobuf/wrappers.proto";
+import "wikiPageUpdateSent.proto";
+package wikiPageAppProto;
+
+
+message GetAllWikiPageUpdateSentRequest {
+	string queryString = 1;
+
+}
+
+message GetAllWikiPageUpdateSentResponse {
+
+	// TBD comment about field 1
+	string statusCode = 1;
+
+	// TBD comment about field 2
+	string statusMessage = 2;
+
+	// TBD comment about field 3
+	int32 count = 3;
+
+	// TBD comment about field 4
+	string query = 4;
+
+	// TBD comment about field 5
+	repeated WikiPageUpdateSent data = 5;
+
+}

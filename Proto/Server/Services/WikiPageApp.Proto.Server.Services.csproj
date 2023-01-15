@@ -1,0 +1,47 @@
+
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.20.1" />
+    <PackageReference Include="Grpc.Core.Api" Version="2.45.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.45.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="TinyMapper" Version="3.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Data\WikiPageApp.Data.csproj" />
+    <ProjectReference Include="..\..\..\Model\WikiPageApp.Model.csproj" />
+    <ProjectReference Include="..\..\Library\WikiPageApp.Proto.Library.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+			<Protobuf Include="../../Library/wikiPageGetAll.proto" GrpcServices="Server" />
+		<Protobuf Include="../../Library/wikiPageGetById.proto" GrpcServices="Server" />
+		
+		<Protobuf Include="../../Library/wikiPagePut.proto" GrpcServices="Server" />
+		<Protobuf Include="../../Library/wikiPageService.proto" GrpcServices="Server" />
+		<Protobuf Include="../../Library/wikiPage.proto" GrpcServices="Server" />
+			<Protobuf Include="../../Library/wikiPageUpdateGetAll.proto" GrpcServices="Server" />
+		<Protobuf Include="../../Library/wikiPageUpdateGetById.proto" GrpcServices="Server" />
+		
+		<Protobuf Include="../../Library/wikiPageUpdatePut.proto" GrpcServices="Server" />
+		<Protobuf Include="../../Library/wikiPageUpdateService.proto" GrpcServices="Server" />
+		<Protobuf Include="../../Library/wikiPageUpdate.proto" GrpcServices="Server" />
+			<Protobuf Include="../../Library/wikiPageUpdateSentGetAll.proto" GrpcServices="Server" />
+		<Protobuf Include="../../Library/wikiPageUpdateSentGetById.proto" GrpcServices="Server" />
+		
+		<Protobuf Include="../../Library/wikiPageUpdateSentPut.proto" GrpcServices="Server" />
+		<Protobuf Include="../../Library/wikiPageUpdateSentService.proto" GrpcServices="Server" />
+		<Protobuf Include="../../Library/wikiPageUpdateSent.proto" GrpcServices="Server" />
+		
+	</ItemGroup>
+
+</Project>

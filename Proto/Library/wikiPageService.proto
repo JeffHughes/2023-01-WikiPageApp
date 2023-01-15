@@ -1,0 +1,20 @@
+syntax = "proto3";
+option csharp_namespace = "WikiPageApp.Proto.Library";
+import "wikiPageGetAll.proto";
+import "wikiPageGetById.proto";
+import "wikiPagePut.proto";
+
+
+package wikiPageAppProto;
+
+//The entity service definition
+service WikiPageServiceProto{
+	rpc GetWikiPage (GetWikiPageByIdRequest) returns (GetWikiPageByIdResponse);
+
+
+
+
+rpc GetAllWikiPage (GetAllWikiPageRequest) returns (GetAllWikiPageResponse);
+rpc PutWikiPage (PutWikiPageRequest) returns (PutWikiPageResponse);
+
+}

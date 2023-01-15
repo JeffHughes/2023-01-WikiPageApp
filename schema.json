@@ -1,0 +1,184 @@
+{
+  "amiId": "d7b2343c-fe97-4b47-a565-418cb8645a7c",
+  "version": "1.0.0",
+  "title": "WikiPage",
+ 	"nickname": "WikiPage",
+  "includeAzureApi": true,
+    "databasetarget": "cosmos",
+    "dependencies": [],
+  "definition": {
+    "protoFieldNumber": 5,
+    "title": "WikiPage",
+    "amiId": "d7b2343c-fe97-4b47-a565-418cb8645a7b",
+    "nickname": "WikiPage",
+    "sqlObjId": 1125579048,
+    "isDeleted": false,
+    "properties": [
+      {
+        "amiId": "f13be292-4151-4a5f-88a3-6112b53b85f0",
+        "name": "WikiPageIDint",
+        "nickname": "WikiPageIDint",
+        "required": true,
+        "type": "int",
+        "length": null,
+        "precision": null,
+        "scale": null,
+        "sqlObjId": 1125579048,
+        "sqlColId": 2,
+        "protoFieldNumber": 7,
+        "isDeleted": false
+      }
+    ],
+    "children": [
+      {
+        "protoFieldNumber": 5,
+        "title": "WikiPageUpdate",
+        "amiId": "199130fb-4632-4e1e-8e2b-bc7a677fb6fd",
+        "nickname": "WikiPageUpdate",
+        "sqlObjId": 1365579903,
+        "isDeleted": false,
+        "properties": [
+          {
+            "amiId": "21999679-c748-4005-99c3-84e92a8e268d",
+            "name": "WikiPageID",
+            "nickname": "WikiPageID",
+            "required": true,
+            "type": "uniqueidentifier",
+            "length": 16,
+            "precision": null,
+            "scale": null,
+            "sqlObjId": 1365579903,
+            "sqlColId": 1,
+            "protoFieldNumber": 6,
+            "isDeleted": false
+          },
+          {
+            "amiId": "c02311a0-8e0a-4ec1-b6e7-a0256f41e880",
+            "name": "WikiPageTitleMAX",
+            "nickname": "WikiPageTitleMAX",
+            "required": true,
+            "type": "varchar",
+            "length": -1,
+            "precision": null,
+            "scale": null,
+            "sqlObjId": 1365579903,
+            "sqlColId": 3,
+            "protoFieldNumber": 8,
+            "isDeleted": false
+          },
+          {
+            "amiId": "0dbb7e52-d959-49d9-b82f-1aa2d687fef3",
+            "name": "WikiPageUpdateInjestDatetime",
+            "nickname": "WikiPageUpdateInjestDatetime",
+            "required": true,
+            "type": "datetime",
+            "length": null,
+            "precision": null,
+            "scale": null,
+            "sqlObjId": 1365579903,
+            "sqlColId": 4,
+            "protoFieldNumber": 9,
+            "isDeleted": false
+          },
+          {
+            "amiId": "2149ec2c-53d9-4752-8741-2fcdfd852f78",
+            "name": "WikiPageUpdateInjestOrderNum",
+            "nickname": "WikiPageUpdateInjestOrderNum",
+            "required": true,
+            "type": "int",
+            "length": null,
+            "precision": null,
+            "scale": null,
+            "sqlObjId": 1365579903,
+            "sqlColId": 5,
+            "protoFieldNumber": 10,
+            "isDeleted": false
+          },
+          {
+            "amiId": "8b41cab4-caf7-4058-89f6-81325fa61073",
+            "name": "WikiPageUpdateJsonMAX",
+            "nickname": "WikiPageUpdateJsonMAX",
+            "required": true,
+            "type": "varchar",
+            "length": -1,
+            "precision": null,
+            "scale": null,
+            "sqlObjId": 1365579903,
+            "sqlColId": 6,
+            "protoFieldNumber": 11,
+            "isDeleted": false
+          },
+          {
+            "amiId": "88dfb738-79b0-43d3-9a67-dee66f392648",
+            "name": "WikiPageUpdateTimestamp",
+            "nickname": "WikiPageUpdateTimestamp",
+            "required": true,
+            "type": "datetime",
+            "length": 8,
+            "precision": null,
+            "scale": null,
+            "sqlObjId": 1365579903,
+            "sqlColId": 7,
+            "protoFieldNumber": 12,
+            "isDeleted": false
+          },
+          {
+            "amiId": "d99325a9-2358-49a1-9ce7-e8daeaf45b06",
+            "name": "WikiPageUpdateContributorIDInt",
+            "nickname": "WikiPageUpdateContributorIDInt",
+            "required": true,
+            "type": "int",
+            "length": null,
+            "precision": null,
+            "scale": null,
+            "sqlObjId": 1365579903,
+            "sqlColId": 8,
+            "protoFieldNumber": 13,
+            "isDeleted": false
+          }
+        ],
+        "children": [
+          {
+            "protoFieldNumber": 5,
+            "title": "WikiPageUpdateSent",
+            "amiId": "d570e82a-56cc-401a-ba1d-77267d425588",
+            "nickname": "WikiPageUpdateSent",
+            "sqlObjId": 1029578706,
+            "isDeleted": false,
+            "properties": [
+              {
+                "amiId": "40031190-6b47-4075-a06a-87397113a024",
+                "name": "UserID",
+                "nickname": "UserID",
+                "required": true,
+                "type": "uniqueidentifier",
+                "length": 16,
+                "precision": null,
+                "scale": null,
+                "sqlObjId": 1029578706,
+                "sqlColId": 1,
+                "protoFieldNumber": 6,
+                "isDeleted": false
+              },
+              {
+                "amiId": "9387a71b-564c-464a-b371-878211e94b9a",
+                "name": "WikiPageUpdateID",
+                "nickname": "WikiPageUpdateID",
+                "required": true,
+                "type": "uniqueidentifier",
+                "length": 16,
+                "precision": null,
+                "scale": null,
+                "sqlObjId": 1029578706,
+                "sqlColId": 2,
+                "protoFieldNumber": 7,
+                "isDeleted": false
+              }
+            ],
+            "children": []
+          }
+        ]
+      }
+    ]
+  }
+}

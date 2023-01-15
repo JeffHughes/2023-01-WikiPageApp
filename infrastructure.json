@@ -1,0 +1,254 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "name": {
+      "type": "string"
+    },
+    "version":{
+      "type": "string"
+    },
+    "environment": {
+      "type": "string"
+    },
+    "location": {
+      "defaultValue": "[resourceGroup().location]",
+      "type": "String"
+    },
+    "appInsightsWorkspaceId": {
+      "type": "String"
+    },
+    "tags": {
+      "type": "object"
+    },
+    "allowedOrigins": {
+      "type": "array"
+    },
+    "administratorLogin": {
+      "type": "String",
+      "defaultValue": "[concat(uniqueString(resourceGroup().id, '82d6d94c-df39-4302-a2ff-3235de7d18cb'))]"
+    },
+    "administratorLoginPassword": {
+      "type": "String",
+      "defaultValue": "[concat('P', uniqueString(resourceGroup().id), 'x', '!')]"
+    }
+  },
+  "variables": {
+    "uniqueString": "[uniqueString(subscription().id, resourceGroup().Name)]",
+    "formattedEnvironment": "[if(equals(parameters('environment'), 'prod'), '', concat(parameters('environment'), '-'))]",
+    "unformattedKeyVaultName": "[concat('kv-', parameters('name'), '-',  variables('formattedEnvironment'), variables('uniqueString'))]",
+    "formattedKeyVaultName": "[if(greater(length(variables('unformattedKeyVaultName')), 24), substring(variables('unformattedKeyVaultName'), 0, 24), variables('unformattedKeyVaultName'))]",
+    "functionName": "[concat('func-', parameters('name'), '-', parameters('version'), '-', variables('formattedEnvironment'), variables('uniqueString'))]",
+    "functionPlanName": "[concat('plan-', parameters('name'), '-', parameters('version'), '-', variables('formattedEnvironment'),  variables('uniqueString'))]",
+    "databaseServerName": "[concat('sql-', parameters('name'), '-', variables('formattedEnvironment'), variables('uniqueString'))]",
+    "databaseName": "[concat('sqldb-', parameters('name'))]",
+    "functionStorageAccountName": "[concat('st', uniqueString(subscription().id, resourceGroup().name, parameters('name'), parameters('version'), variables('formattedEnvironment')))]",
+    "sqlKeyName": "SqlConnectionString"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.KeyVault/vaults",
+      "apiVersion": "2019-09-01",
+      "name": "[variables('formattedKeyVaultName')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "enabledForDeployment": false,
+        "enabledForDiskEncryption": false,
+        "enabledForTemplateDeployment": false,
+        "tenantId": "[subscription().tenantId]",
+        "accessPolicies": [],
+        "sku": {
+          "name": "Standard",
+          "family": "A"
+        },
+        "enableRbacAuthorization": true,
+        "networkAcls": {
+          "defaultAction": "Allow",
+          "bypass": "AzureServices"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "apiVersion": "2019-09-01",
+      "name": "[concat(variables('formattedKeyVaultName'), '/', variables('sqlKeyName'))]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.KeyVault/vaults', variables('formattedKeyVaultName'))]",
+        "[variables('databaseServerName')]"
+      ],
+      "properties": {
+        "value": "[concat('Server=tcp:', reference(variables('databaseServerName')).fullyQualifiedDomainName,',1433;Initial Catalog=',variables('databaseName'),';Persist Security Info=False;User ID=',reference(variables('databaseServerName')).administratorLogin,';Password=', parameters('administratorLoginPassword'),';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;')]"
+      }
+    },
+    {
+      "type": "microsoft.insights/components",
+      "apiVersion": "2020-02-02-preview",
+      "name": "[variables('functionName')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "kind": "web",
+      "properties": {
+        "Application_Type": "web",
+        "Flow_Type": "Redfield",
+        "Request_Source": "IbizaWebAppExtensionCreate",
+        "WorkspaceResourceId": "[parameters('appInsightsWorkspaceId')]",
+        "IngestionMode": "LogAnalytics",
+        "publicNetworkAccessForIngestion": "Enabled",
+        "publicNetworkAccessForQuery": "Enabled"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2019-08-01",
+      "name": "[variables('functionName')]",
+      "kind": "functionapp,windows",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "dependsOn": [
+        "[variables('functionPlanName')]",
+        "[variables('functionStorageAccountName')]",
+        "[resourceId('microsoft.insights/components', variables('functionName'))]",
+        "[variables('databaseServerName')]"
+      ],
+      "properties": {
+        "name": "[variables('functionName')]",
+        "siteConfig": {
+          "appSettings": [
+            {
+              "name": "FUNCTIONS_WORKER_RUNTIME",
+              "value": "dotnet"
+            },
+            {
+              "name": "FUNCTIONS_EXTENSION_VERSION",
+              "value": "~3"
+            },
+            {
+              "name": "AzureWebJobsStorage",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('functionStorageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('functionStorageAccountName')),'2019-06-01').keys[0].value)]"
+            },
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(concat('microsoft.insights/components/', variables('functionName'))).InstrumentationKey]"
+            },
+            {
+              "name": "SqlConnectionString",
+              "value": "[concat('@Microsoft.KeyVault(SecretUri=https://', variables('formattedKeyVaultName'), '.vault.azure.net/secrets/', variables('sqlKeyName'), ')')]"
+            }
+          ]
+        },
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('functionPlanName'))]",
+        "clientAffinityEnabled": false
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/config",
+      "apiVersion": "2018-11-01",
+      "name": "[concat(variables('functionName'), '/web')]",
+      "location": "South Central US",
+      "dependsOn": [
+        "[variables('functionName')]"
+      ],
+      "properties": {
+        "cors": {
+          "allowedOrigins": "[parameters('allowedOrigins')]",
+          "supportCredentials": false
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2019-08-01",
+      "name": "[variables('functionPlanName')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "kind": "windows",
+      "properties": {
+        "reserved": true
+      },
+      "sku": {
+        "Tier": "Dynamic",
+        "Name": "Y1"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('functionStorageAccountName')]",
+      "apiVersion": "2019-06-01",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "kind": "StorageV2",
+      "sku": {
+        "name": "Standard_LRS"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers",
+      "apiVersion": "2020-02-02-preview",
+      "name": "[variables('databaseServerName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "administratorLogin": "[parameters('administratorLogin')]",
+        "administratorLoginPassword": "[parameters('administratorLoginPassword')]"
+      },
+      "resources": [
+        {
+          "type": "databases",
+          "apiVersion": "2020-08-01-preview",
+          "name": "[variables('databaseName')]",
+          "location": "[parameters('location')]",
+          "sku": {
+            "name": "GP_S_Gen5",
+            "tier": "GeneralPurpose",
+            "family": "Gen5",
+            "capacity": 1
+          },
+          "properties": {
+            "maxSizeBytes": 1073741824
+          },
+          "dependsOn": [
+            "[variables('databaseServerName')]"
+          ]
+        },
+        {
+          "type": "Microsoft.Sql/servers/firewallRules",
+          "apiVersion": "2021-02-01-preview",
+          "name": "[concat(variables('databaseServerName'), '/AllowAllWindowsAzureIps')]",
+          "properties": {
+            "startIpAddress": "0.0.0.0",
+            "endIpAddress": "0.0.0.0"
+          },
+          "dependsOn": [
+            "[variables('databaseServerName')]"
+          ]
+        }
+      ]
+    }
+  ],
+  "outputs": {
+    "connectionString": {
+      "type": "string",
+      "value": "[concat('Server=tcp:', reference(variables('databaseServerName')).fullyQualifiedDomainName,',1433;Initial Catalog=',variables('databaseName'),';Persist Security Info=False;User ID=',reference(variables('databaseServerName')).administratorLogin,';Password=', parameters('administratorLoginPassword'),';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;')]"
+    },
+    "functionAppName": {
+      "type": "string",
+      "value": "[variables('functionName')]"
+    },
+    "functionIdentity":{
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Web/sites', variables('functionName')), '2019-08-01', 'full').identity.principalId]"
+    },
+    "keyVaultResourceId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.KeyVault/vaults', variables('formattedKeyVaultName'))]"
+    },
+    "functionAppUri": {
+      "type": "string",
+      "value": "[concat('https://',variables('functionName'),'.azurewebsites.net')]"
+    }
+  }
+}
